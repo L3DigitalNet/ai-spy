@@ -23,5 +23,10 @@
 		"allowJs": true
 	},
 	"include": ["**/*.ts", "**/*.mts", "**/*.cts", "**/*.mjs"],
-	"exclude": [".venv", "node_modules", "dist"]
+
+	// web/ is the browser app and carries its own DOM/JSX config. Excluding it
+	// here gives every file exactly one owning project, which is what keeps
+	// typescript-eslint's projectService from having to guess. `npm run
+	// typecheck` runs both projects.
+	"exclude": [".venv", "node_modules", "dist", "web"]
 }

@@ -13,3 +13,6 @@ dist/
 # Node / TypeScript
 node_modules/
 *.tsbuildinfo
+
+# Vite build output for the web app
+web/dist/

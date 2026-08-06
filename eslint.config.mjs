@@ -7,9 +7,9 @@ export default defineConfig(
 	// .venv/ ships third-party JavaScript (basedpyright's bundled language server,
 	// coverage's HTML report assets, an entire vendored npm). Without this ignore
 	// ESLint walks into it and reports thousands of violations in code we do not own.
-	globalIgnores([".venv/", "node_modules/", "dist/"]),
+	globalIgnores([".venv/", "node_modules/", "dist/", "web/dist/"]),
 	{
-		files: ["**/*.{ts,mts,cts,js,mjs,cjs}"],
+		files: ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"],
 		extends: [
 			js.configs.recommended,
 			tseslint.configs.recommendedTypeChecked,

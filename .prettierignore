@@ -4,6 +4,7 @@
 .venv/
 node_modules/
 dist/
+web/dist/
 
 # npm rewrites both of these in its own 2-space style on every install, so
 # letting Prettier tab-indent them only produces churn that npm undoes.

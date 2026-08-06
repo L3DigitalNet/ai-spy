@@ -1,0 +1,30 @@
+{
+	// The repo-root tsconfig is Node-oriented and excludes this directory, so this
+	// config owns every TypeScript file under web/. Keeping one config per file
+	// also keeps typescript-eslint's projectService unambiguous: the nearest
+	// tsconfig above a web/ file is always this one.
+	"compilerOptions": {
+		"target": "es2023",
+		"lib": ["es2023", "dom", "dom.iterable"],
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		// vite.config.ts is Node code and shares this project, so Node's globals
+		// (import.meta.dirname) must be in scope. skipLibCheck suppresses the
+		// duplicate DOM/undici global declarations that pairing the two produces.
+		"types": ["node", "vite/client"],
+		"jsx": "react-jsx",
+
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"exactOptionalPropertyTypes": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+
+		"noEmit": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
+	"exclude": ["dist"]
+}
