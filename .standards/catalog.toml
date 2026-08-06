@@ -1,8 +1,8 @@
 [project_standards]
 schema_version = "1.0"
 catalog = "5"
-release = "5.15.0"
-digest = "sha256:05ff8e00eb5d0db7d3b91b09c41e39d8b612060f2350b9f9c65a8037629a9ef5"
+release = "5.16.0"
+digest = "sha256:45b5491644fae4ddad3acfb55bdd4bd6fbfb9c81d1bf5bc45a6cd6f1a1f2c2f0"
 
 [standards.adr]
 status = "active"
@@ -119,8 +119,8 @@ payload_digest = "sha256:7c6e609bdccdf526cb1426b817b26efcc5622552138ac5e826d917a
 
 [standards.markdown-frontmatter]
 status = "active"
-available = ["1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8"]
-default = "1.8"
+available = ["1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9"]
+default = "1.9"
 candidates = []
 
 [standards.markdown-frontmatter.versions."1.2"]
@@ -154,14 +154,19 @@ availability = "consumer"
 payload_digest = "sha256:d61d35208e6e2f1c1772ce994459ab1d4b8fd8174b5d22a9caebfdce531eb518"
 
 [standards.markdown-frontmatter.versions."1.8"]
-channel = "stable"
+channel = "retained"
 availability = "consumer"
 payload_digest = "sha256:79410e07c98f8f9fcc69e1c31b8b2971134c8d19b855fe81008c296fb6850470"
 
+[standards.markdown-frontmatter.versions."1.9"]
+channel = "stable"
+availability = "consumer"
+payload_digest = "sha256:5f08a86214605fb25db4bc48f78ccb68bae52a707506e0adf28117d3ae1d76a5"
+
 [standards.markdown-tooling]
 status = "active"
-available = ["1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11", "1.12"]
-default = "1.12"
+available = ["1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11", "1.12", "1.13"]
+default = "1.13"
 candidates = []
 
 [standards.markdown-tooling.versions."1.2"]
@@ -215,14 +220,19 @@ availability = "consumer"
 payload_digest = "sha256:3bf59aa23a857174bfcaf604de07318b61ec177b9fab1f016ad4c6516e4ff882"
 
 [standards.markdown-tooling.versions."1.12"]
-channel = "stable"
+channel = "retained"
 availability = "consumer"
 payload_digest = "sha256:105d742c188f78cd908cd715a396722912d031114ea1e5e6445d1dc879a1e7b8"
 
+[standards.markdown-tooling.versions."1.13"]
+channel = "stable"
+availability = "consumer"
+payload_digest = "sha256:271cfbb5e5abde80439cb1f90b9d2eb55720fd52bff3d78f51057efa72aabfba"
+
 [standards.project-spec]
 status = "active"
-available = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6"]
-default = "1.6"
+available = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"]
+default = "1.7"
 candidates = []
 
 [standards.project-spec.versions."1.1"]
@@ -251,9 +261,14 @@ availability = "consumer"
 payload_digest = "sha256:e4286963cf591e3ee1454e5be317519b6610d3257dc61eb08de489d47ba407e1"
 
 [standards.project-spec.versions."1.6"]
-channel = "stable"
+channel = "retained"
 availability = "consumer"
 payload_digest = "sha256:0f3bc8952fe4ef58e7619fecf1476ebd863a6cbb4eddf93bdbdea758f835be4c"
+
+[standards.project-spec.versions."1.7"]
+channel = "stable"
+availability = "consumer"
+payload_digest = "sha256:2d012e3de7699dc44bdf4ee8605cf350caca3ba05b0c490b8ff795ce5014df8f"
 
 [standards.python-coding]
 status = "draft"
@@ -272,8 +287,8 @@ payload_digest = "sha256:a4c4d6f0d61f81beeabefe48a8ef29f9789b55d7159ab01bb64b1da
 
 [standards.python-tooling]
 status = "active"
-available = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11"]
-default = "1.11"
+available = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "1.10", "1.11", "1.12"]
+default = "1.12"
 candidates = []
 
 [standards.python-tooling.versions."1.1"]
@@ -327,9 +342,14 @@ availability = "consumer"
 payload_digest = "sha256:1f397497be8e925d79f46003d7297813a7d02ea7ff0112cf523354e0a4300398"
 
 [standards.python-tooling.versions."1.11"]
-channel = "stable"
+channel = "retained"
 availability = "consumer"
 payload_digest = "sha256:8d288645905cbf8954f246e3631d8636353ac590d62eacc70e68ae75e1057fb2"
+
+[standards.python-tooling.versions."1.12"]
+channel = "stable"
+availability = "consumer"
+payload_digest = "sha256:7595019e39b209fb700817b0563aa2e5db50d368c3c5042eeb714e234076de5f"
 
 [standards.standard-bundle-authoring]
 status = "active"

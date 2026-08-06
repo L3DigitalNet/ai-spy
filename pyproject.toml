@@ -53,9 +53,12 @@ target-version = "py314"
 line-length = 100
 src = ["src", "tests"]
 extend-exclude = [".claude", ".agents", ".codex", ".continue"]
+extend-include = []
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "C4", "PIE", "PTH", "RET", "RUF"]
 ignore = ["E501"]
+extend-ignore = []
+extend-select = []
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]
 [tool.ruff.format]

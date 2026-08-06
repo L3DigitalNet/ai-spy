@@ -3,5 +3,20 @@
     "chrome-devtools-mcp@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'if python3 -c \"import sys; raise SystemExit(sys.version_info < (3, 14))\" </dev/null >/dev/null 2>&1; then exec python3 \"$1\"; elif command -v uv >/dev/null 2>&1 && uv run --no-project --python 3.14 --no-python-downloads python3 -c \"import sys; raise SystemExit(sys.version_info < (3, 14))\" </dev/null >/dev/null 2>&1; then exec uv run --no-project --python 3.14 --no-python-downloads python3 \"$1\"; else printf \"%s\\n\" \"agent-handoff: requires Python 3.14+ or uv with an installed Python 3.14\" >&2; exit 127; fi' agent-handoff \"${CLAUDE_PROJECT_DIR}/.agents/hooks/agent-handoff/session_start.py\"",
+            "timeout": 10,
+            "statusMessage": "Loading agent handoff state..."
+          }
+        ]
+      }
+    ]
   }
 }

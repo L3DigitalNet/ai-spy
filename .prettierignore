@@ -18,3 +18,7 @@ package-lock.json
 .vscode/
 AGENTS.md
 CLAUDE.md
+
+# Centrally locked by Agent Handoff; its adopt guide requires this exclusion.
+# Prettier would otherwise rewrite SKILL.md and break the lock digest.
+.agents/skills/agent-handoff/**

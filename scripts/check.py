@@ -13,12 +13,47 @@ options:
 """
 
 COMMANDS: tuple[tuple[str, ...], ...] = (
-    ("uv", "run", "ruff", "format", "--check", "src", "tests"),
-    ("uv", "run", "ruff", "check", "src", "tests"),
-    ("uv", "run", "basedpyright"),
-    ("uv", "run", "coverage", "run", "-m", "pytest"),
-    ("uv", "run", "coverage", "report"),
-    ("uv", "run", "pip-audit"),
+    (
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+    ),
+    (
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+    ),
+    (
+        "uv",
+        "run",
+        "basedpyright",
+    ),
+    (
+        "uv",
+        "run",
+        "coverage",
+        "run",
+        "-m",
+        "pytest",
+    ),
+    (
+        "uv",
+        "run",
+        "coverage",
+        "report",
+    ),
+    (
+        "uv",
+        "run",
+        "pip-audit",
+    ),
 )
 
 
@@ -48,7 +83,14 @@ def main(argv: Sequence[str]) -> int:
         None,
     )
     if unrecognized is not None:
-        print(f"scripts/check.py: error: unrecognized argument: {unrecognized}", file=sys.stderr)
+        # Pre-split with a magic trailing comma: `ruff.line_length` accepts values
+        # down to 79, and this call is 97 columns joined. Issue #115's original
+        # 1.10 report had no per-root argv at all, so a low line_length was the
+        # only way its managed script could fail its own formatter stage.
+        print(
+            f"scripts/check.py: error: unrecognized argument: {unrecognized}",
+            file=sys.stderr,
+        )
         print(USAGE, end="", file=sys.stderr)
         return 2
     if arguments:
