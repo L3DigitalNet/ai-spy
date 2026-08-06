@@ -1,0 +1,64 @@
+[project]
+name = "ai-spy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Chris Purcell", email = "168346341+chrisdpurcell@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+ai-spy = "ai_spy:main"
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "basedpyright",
+    "coverage[toml]",
+    "pip-audit",
+    "pytest>=9.0",
+    "ruff>=0.14.11",
+]
+
+[tool.basedpyright]
+extraPaths = ["src"]
+failOnWarnings = true
+include = ["src", "tests"]
+pythonPlatform = "All"
+pythonVersion = "3.14"
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+markers = []
+minversion = "9.0"
+testpaths = ["tests"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 85
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = [".claude", ".agents", ".codex", ".continue"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "C4", "PIE", "PTH", "RET", "RUF"]
+ignore = ["E501"]
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

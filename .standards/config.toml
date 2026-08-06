@@ -1,0 +1,52 @@
+[project_standards]
+schema_version = "1.0"
+catalog = "5"
+
+[standards.python-tooling]
+enabled = true
+version = "latest"
+
+[standards.python-tooling.config]
+contract_version = "1.1"
+python_version = "3.14"
+build_backend = "uv_build"
+source_layout = "src"
+additional_source_roots = []
+additional_dev_dependencies = []
+workflow_ownership = "consumer-owned"
+script_ownership = "managed"
+
+[standards.python-tooling.config.ruff]
+line_length = 100
+extend_exclude = [".claude", ".agents", ".codex", ".continue"]
+extend_include = []
+extend_select = []
+extend_ignore = []
+
+[standards.python-tooling.config.type_checker]
+name = "basedpyright"
+mode = "strict"
+
+[standards.python-tooling.config.pytest]
+fail_under = 85
+markers = []
+coverage_exclude_also = []
+test_paths = ["tests"]
+
+[standards.python-tooling.config.coverage]
+parallel = false
+patch = []
+omit = []
+
+[standards.python-tooling.config.pip_audit]
+ignore_vulnerabilities = []
+
+[standards.python-tooling.config.ci]
+enabled = false
+performance = false
+
+[standards.python-tooling.config.vscode]
+format_on_save = true
+
+[standards.python-tooling.config.agent_instructions]
+include_fix_commands = true

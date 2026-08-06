@@ -1,0 +1,11 @@
+{
+	"recommendations": [
+		"charliermarsh.ruff",
+		"detachhead.basedpyright",
+		"editorconfig.editorconfig",
+		"github.vscode-github-actions",
+		"ms-python.python",
+		"redhat.vscode-yaml",
+		"tamasfe.even-better-toml"
+	]
+}
