@@ -15,3 +15,14 @@ indent_style = space
 [*.toml]
 indent_size = 4
 indent_style = space
+
+# The YAML spec forbids tabs for indentation, so the global tab default above
+# would produce files that no YAML parser accepts.
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space
+
+# Two trailing spaces are a Markdown hard line break. The global
+# trim_trailing_whitespace would silently delete them on save.
+[*.md]
+trim_trailing_whitespace = false

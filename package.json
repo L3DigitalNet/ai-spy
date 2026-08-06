@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
+    "fix": "npm run lint:fix && npm run format",
     "format": "prettier --write \"**/*.{ts,mts,cts,js,mjs,cjs}\"",
     "format:check": "prettier --check \"**/*.{ts,mts,cts,js,mjs,cjs}\"",
     "check": "npm run format:check && npm run typecheck && npm run lint"
