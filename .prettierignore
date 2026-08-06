@@ -1,0 +1,20 @@
+# Prettier is scoped to TypeScript/JavaScript here. Ruff owns Python formatting,
+# and the project-standards control plane owns the files it composes.
+
+.venv/
+node_modules/
+dist/
+
+# npm rewrites both of these in its own 2-space style on every install, so
+# letting Prettier tab-indent them only produces churn that npm undoes.
+package.json
+package-lock.json
+
+# Harness configuration, not source.
+.claude/
+
+# Composed by `project-standards reconcile`. Reformatting these reappears as
+# drift on the next `--apply`, so Prettier must not touch them.
+.vscode/
+AGENTS.md
+CLAUDE.md

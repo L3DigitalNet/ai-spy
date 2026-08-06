@@ -1,27 +1,27 @@
 {
-  "compilerOptions": {
-    "target": "es2023",
-    "lib": ["es2023"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "types": ["node"],
+	"compilerOptions": {
+		"target": "es2023",
+		"lib": ["es2023"],
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"types": ["node"],
 
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"exactOptionalPropertyTypes": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
 
-    "noEmit": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
 
-    // allowJs is what makes eslint.config.mjs a project input. Without it the
-    // project has zero files (TS18003) and typescript-eslint's projectService
-    // cannot supply type information when linting the config itself.
-    "allowJs": true
-  },
-  "include": ["**/*.ts", "**/*.mts", "**/*.cts", "**/*.mjs"],
-  "exclude": [".venv", "node_modules", "dist"]
+		// allowJs is what makes eslint.config.mjs a project input. Without it the
+		// project has zero files (TS18003) and typescript-eslint's projectService
+		// cannot supply type information when linting the config itself.
+		"allowJs": true
+	},
+	"include": ["**/*.ts", "**/*.mts", "**/*.cts", "**/*.mjs"],
+	"exclude": [".venv", "node_modules", "dist"]
 }

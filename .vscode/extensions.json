@@ -1,8 +1,10 @@
 {
 	"recommendations": [
 		"charliermarsh.ruff",
+		"dbaeumer.vscode-eslint",
 		"detachhead.basedpyright",
 		"editorconfig.editorconfig",
+		"esbenp.prettier-vscode",
 		"github.vscode-github-actions",
 		"ms-python.python",
 		"redhat.vscode-yaml",
