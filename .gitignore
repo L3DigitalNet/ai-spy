@@ -9,3 +9,7 @@ dist/
 .coverage.*
 .ruff_cache/
 .pytest_cache/
+
+# Node / TypeScript
+node_modules/
+*.tsbuildinfo
