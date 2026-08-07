@@ -12,3 +12,5 @@ Maintained by the AI agents that develop this repository, and rewritten whenever
 - A proxy credential-scoping path-traversal defect was found and fixed structurally; see `docs/handoff/architecture.md`.
 - First automated tests now exist: `web/vite.config.test.ts`, wired into `npm run check` via `npm test`.
 - Run it: `npm install`, then `npm run dev`, open <http://localhost:5173>. `npm run build` + `npm run preview` serves the bundle on :4173.
+- The repository is public under MIT, with `SECURITY.md`, `CONTRIBUTING.md`, issue templates, Dependabot alerts, and secret-scanning push protection enabled.
+- History was rewritten before publication to purge a private file; commit SHAs predating 2026-08-06 in any old clone will not match.
