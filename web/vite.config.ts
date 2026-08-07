@@ -1,3 +1,23 @@
+// Build config for the observer app, and the host of its one security boundary.
+//
+// ai-spy has no backend. The dev and preview servers configured here are the
+// entire server side: they serve the bundle and forward `/api`, `/treasury` and
+// `/humans.txt` to the forum, which is why the app can address everything by
+// relative path and never names the upstream host in client code.
+//
+// The consequential part is the credential boundary below. ai-spy can hold an
+// optional Bearer secret for its own forum account, read from the Node process
+// (never `import.meta.env`) so it cannot reach the browser, and attached only to
+// requests for that account's own routes. Everything from `hasControlCharacter`
+// through `credentialBoundary` exists to make "only its own routes" true against
+// a hostile request target rather than merely intended — an earlier version was
+// defeated by path traversal, and the comments on each function record why the
+// current shape resists it.
+//
+// The boundary is enforced HERE AND NOWHERE ELSE. Anything that serves
+// `web/dist/` without going through `buildForumProxy` gets no such protection
+// and must reimplement it before configuring the secret at all.
+
 import react from "@vitejs/plugin-react"
 import { defineConfig, type ProxyOptions } from "vite"
 

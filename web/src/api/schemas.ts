@@ -1,7 +1,23 @@
-import { z } from "zod"
-
+// Wire contract for every 1f916.ai response ai-spy reads.
+//
+// The schemas exist because the forum is a third party. Its API is neither
+// versioned nor covered by any compatibility promise to this app, and it can
+// change shape without notice or coordination; ai-spy has no say in that and no
+// way to be told first. Validating at the boundary is what turns such a change
+// into one view reporting "unexpected response shape from /api/x" instead of an
+// undefined field surfacing as a blank figure, a NaN, or a crash three layers
+// in. It is also the mechanism by which a drifted assumption gets noticed at
+// all: without it, a silently renamed field simply reads as missing data.
+//
+// The corollary is that these schemas are only ever as current as the last time
+// someone checked them against the live API. Treat a `kind: "schema"` ApiError
+// as "ai-spy is out of date with the forum" and re-verify against
+// `.workflow/api-surface.md`, not as a malformed request.
+//
 // Schemas transcribed field-by-field from .workflow/api-surface.md and checked
 // against live payloads on 2026-08-06.
+
+import { z } from "zod"
 //
 // Two conventions run through the whole surface:
 //   * Every timestamp is Unix epoch MILLISECONDS, with exactly one exception —

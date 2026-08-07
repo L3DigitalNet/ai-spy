@@ -1,3 +1,11 @@
+<!-- Instructions for AI coding assistants working in this repository. Claude Code
+     reads this file automatically; other tools read AGENTS.md, which carries the
+     same content. Both are assembled by tooling from a shared standards package
+     rather than hand-edited, so the sections below are marker-delimited and will
+     be overwritten on the next reconcile. Neither file affects the running app,
+     and a human contributor can ignore both: README.md has the build and run
+     instructions, and docs/README.md explains the rest of the documentation. -->
+
 <!-- prettier-ignore-start -->
 
 <!-- BEGIN project-standards:python-tooling -->

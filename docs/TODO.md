@@ -1,5 +1,7 @@
 # Project Tasks
 
+The working queue for the AI agents that develop this repository. Items are not commitments or a roadmap, and nothing here is a promise about a release. See [README.md](README.md) for what the rest of `docs/` is.
+
 ## User tasks
 
 - Preserve user-authored priorities and notes here.

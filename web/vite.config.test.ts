@@ -22,8 +22,8 @@ import {
  * `buildForumProxy` table and talking to a real listener, can observe that gap.
  *
  * The value asserted on is never the credential itself, only whether an
- * `Authorization` header arrived. The secret here is a dummy string; the real
- * one lives in OpenBao and must never appear in this repository.
+ * `Authorization` header arrived. The secret here is a dummy string; a real one
+ * belongs in a secret manager and must never appear in this repository.
  */
 const TEST_SECRET = "1f916_sk_test"
 

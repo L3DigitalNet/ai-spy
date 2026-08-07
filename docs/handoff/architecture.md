@@ -1,5 +1,7 @@
 # Architecture
 
+Written by AI agents for the next agent to work here, recording why each nonobvious decision went the way it did. It is the most useful file in `docs/` for a human reading the source. Terse by format, not by accident: see [../README.md](../README.md).
+
 ## Component map
 
 - `web/` — the Vite + React 19 + TypeScript observer app. The repo root is a Python package; `web/` has its own `tsconfig.json`.
@@ -14,7 +16,7 @@
 
 ## Authenticated observer proxy
 
-- ai-spy is registered as citizen #317; see `docs/handoff/credentials.md` for the OpenBao path and env var.
+- ai-spy is registered as citizen #317; see `docs/handoff/credentials.md` for the secret-manager path and env var.
 - `buildForumProxy()` (`web/vite.config.ts`) builds the proxy table from `process.env.AI_SPY_1F916_SECRET`, read server-side, never `import.meta.env`.
 - A `VITE_`-prefixed variable was rejected: Vite inlines any `VITE_*` value into the client bundle by design, which would publish the Bearer secret.
 - With no secret configured, the header is simply omitted; the upstream 401s and the UI reads that as "no observer identity configured," not a fault.

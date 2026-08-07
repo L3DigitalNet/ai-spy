@@ -1,5 +1,9 @@
 # ai-spy observer UI — Ledger
 
+> **What this file is.** A task ledger written by the AI agents that built ai-spy, one line per unit of work, recording what the work was and what evidence closed it. Maintained by those agents; nothing in it configures or affects the running app. A human visitor can skip it. If you want to know what ai-spy is or how to run it, read [the README](../README.md); if you want to know how it works, read [docs/handoff/architecture.md](../docs/handoff/architecture.md).
+>
+> The notation: `[x]` done, `[~]` deferred. `V0`/`V1`/`V2` is the verification depth an item was closed at: `V0` a read-only finding backed by a grounded source, `V1` a change proven by its own tests plus an independently run smoke check, `V2` a change put through the full gate and re-checked by a separate reviewer working from a fresh context.
+
 Base: main @ 7cbd616d6962f5fbf894aa215784a5797ebddeb4
 Unrelated in-flight work to preserve: staged edit to .claude/settings.json (do not commit or revert).
 
@@ -30,7 +34,7 @@ READY frontier: {1, 2}
 Base: main @ d1036f5. User authorized registration on 1f916.ai; scope = everything except writes and MCP.
 
 - [x] 8. Auth endpoints documented in api-surface.md addendum — V0: from upstream source, 401 shapes live-confirmed
-- [x] 9. Registered on 1f916.ai as citizen #317 (handle ai-spy); secret at secret/apps/ai-spy — V1: orchestrator-run 201 + OpenBao round-trip + authenticated /api/me 200; temp file shredded; credentials.md reference pending in docs leg (item 15)
+- [x] 9. Registered on 1f916.ai as citizen #317 (handle ai-spy); secret stored in the maintainer's secret manager, path recorded in docs/handoff/credentials.md — V1: orchestrator-run 201 + secret-manager round-trip + authenticated /api/me 200; temp file shredded; credentials.md reference pending in docs leg (item 15)
 - [x] 10. Live updates via /api/changes polling on feed views — worker evidence: real-path poll proof, drain-cap 5, next_since cursor discipline, visibility pause; integrated verify at 14
 - [x] 11. Attest witness mode — worker evidence: live save/recheck round-trip (expect_matches:true), simulated mismatch renders red, corrupt-storage safe; integrated verify at 14
 - [x] 12. humans.txt easter egg + "(includes moderated)" census marker — karma column and census stats already existed in d1036f5 (earlier gap report was wrong on those two); integrated verify at 14
@@ -52,7 +56,7 @@ Base: main @ d1036f5. User authorized registration on 1f916.ai; scope = everythi
 - User messages reached the implementer directly instead of the orchestrator; implementer built #/archive against my explicit "keep architecture" restyle constraint rather than flagging the conflict. Work retained (user-authorized); verification retrofitted.
 - Implementer edited the tree during the verifier's audit, invalidating part of that pass; decisive checks were re-run by the verifier against the final tree, and vite.config.ts (the secret boundary) was unchanged during its proxy test.
 
-- [ ] 16. Observation-deck RESTYLE (user-requested 2026-08-06, ref ~/Downloads/xa969n2smphh1.webp): visual design only — KEEP ai-spy's existing architecture, routes, nav, and single-column view structure; adopt the reference's visual language (dark observatory palette, accent-border cards, vote rail treatment, spaced-mono micro-labels, terminal-style stat readouts); USER CONSTRAINTS: no serif anywhere — clean modern sans for display and body, mono only for labels/hashes/readouts; no layout re-architecture; no REPLY affordances; all functionality preserved
+- [ ] 16. Observation-deck RESTYLE (user-requested 2026-08-06, ref: a screenshot of another independent 1F916 observer interface, supplied by the maintainer): visual design only — KEEP ai-spy's existing architecture, routes, nav, and single-column view structure; adopt the reference's visual language (dark observatory palette, accent-border cards, vote rail treatment, spaced-mono micro-labels, terminal-style stat readouts); USER CONSTRAINTS: no serif anywhere — clean modern sans for display and body, mono only for labels/hashes/readouts; no layout re-architecture; no REPLY affordances; all functionality preserved
 
 Deps: 8 -> 9 -> 13; 10,11,12 independent; 13 -> 16 (same files, serialized); 10-13,16 -> 14 -> 15
 Deviation note: item 13 implemented by the engineer (context continuity) instead of a fresh security-role worker; compensated by a security-focused verifier audit in 14.

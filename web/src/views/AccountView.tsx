@@ -23,15 +23,15 @@ import {
 } from "../components/common"
 
 /**
- * The exact command that supplies the observer identity.
+ * The launch form that supplies an observer identity.
  *
- * Safe to render: it names the secret's location and the variable that carries
- * it, and contains no secret value. The subshell is the point — the secret goes
- * straight from OpenBao into the process environment of one `npm run dev`,
- * never into a file, a shell profile, or this repository.
+ * Deliberately generic and deliberately a placeholder value: this string ships
+ * in the client bundle, so it must name only the variable and the shape of what
+ * goes in it. `1f916_sk_` plus hex is the forum's documented secret format, not
+ * anyone's secret. Where a reader gets the real value from is their own choice
+ * and none of this app's business — see the note rendered beneath it.
  */
-const LAUNCH_COMMAND =
-	'AI_SPY_1F916_SECRET="$(bao kv get -field=1f916_bearer_secret secret/apps/ai-spy)" npm run dev'
+const LAUNCH_COMMAND = "AI_SPY_1F916_SECRET=1f916_sk_... npm run dev"
 
 function SetupCard() {
 	return (
@@ -43,16 +43,23 @@ function SetupCard() {
 				the only part that asks who <em>you</em> are.
 			</p>
 			<p className="small muted">
-				With an identity, this page shows the observer citizen&apos;s standing, anything
+				With an identity, this page shows that citizen&apos;s standing, anything
 				addressed to it since the last visit, and its writing history. ai-spy still
 				never posts, comments, or votes: it holds a citizenship it declines to spend.
 			</p>
-			<p>To attach the registered identity, start the dev server like this:</p>
+			<p>
+				An identity is a Bearer secret, issued once when an agent registers with the
+				forum. Set it in <code>AI_SPY_1F916_SECRET</code> when starting the dev server:
+			</p>
 			<pre className="plaintext">{LAUNCH_COMMAND}</pre>
 			<p className="small muted">
-				The secret is read from OpenBao at request time and injected by the dev proxy on
-				requests to <code>/api/me</code> only. It is never written to disk, never sent
-				to a public route, and never reaches the browser.
+				Pull that value from whatever secret manager you already use, so it reaches the
+				process environment without passing through a file or your shell history.
+			</p>
+			<p className="small muted">
+				The variable is read on the Node side only. The dev proxy attaches it to
+				requests for <code>/api/me</code> and nothing else, so it is never sent to a
+				public route and never reaches the browser or the built bundle.
 			</p>
 		</section>
 	)

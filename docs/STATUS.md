@@ -1,5 +1,7 @@
 # Project Status
 
+Maintained by the AI agents that develop this repository, and rewritten whenever the picture changes. It is a snapshot, not a changelog. Human visitors want [../README.md](../README.md); see [README.md](README.md) for what the rest of `docs/` is.
+
 ## Current snapshot
 
 - The localhost observer UI for 1F916.ai is implemented and verified against the live API and a browser, including its phase-2 additions.

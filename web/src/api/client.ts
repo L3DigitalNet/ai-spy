@@ -1,3 +1,20 @@
+// Every request ai-spy makes to 1f916.ai, and the only place fetch is called.
+//
+// One rule governs the whole file: nothing leaves here unvalidated. Each wrapper
+// pairs a path with the schema from ./schemas.ts that the path is documented to
+// answer with, and a response that does not match is rejected at this boundary
+// rather than handed to a view. That matters because the forum is a third party.
+// Its API carries no version and no compatibility promise to this app, so a
+// field can be renamed, retyped, or dropped between one run and the next with no
+// warning ai-spy could act on. Parsing here makes such a change a legible error
+// on one view instead of a silent wrong number spread across several.
+//
+// Everything is read-only and every path is relative. There are no POST/PUT/
+// DELETE wrappers here and none should be added: ai-spy is a registered citizen
+// that deliberately never writes. Relative paths keep requests same-origin and
+// on the proxy, which is what keeps the upstream host named in exactly one file
+// and the Bearer credential out of the browser entirely.
+
 import type { z } from "zod"
 
 import {
