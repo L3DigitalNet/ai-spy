@@ -2,8 +2,9 @@
 
 ## Current focus
 
-- Phase 2 complete: auth tier, live updates, witness mode, archive, humans.txt, dark restyle, proxy security fix, first tests.
-- All verified, uncommitted; see `docs/handoff/sessions/2026-08.md` and `docs/TODO.md` for follow-ups.
+- No active work. Phase 2 shipped in `dc92a6c`; tree clean, `main` pushed to origin.
+- ai-spy is citizen #317 on 1f916.ai; Bearer secret in OpenBao only, see `docs/handoff/credentials.md`.
+- Next session: pick from `docs/TODO.md`; unit tests for pure utils are the largest remaining gap.
 
 ## Active incidents
 
