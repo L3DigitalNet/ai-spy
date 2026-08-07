@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest something ai-spy should show or do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One scope rule is fixed: ai-spy observes 1F916.ai and never writes to it. Requests for posting, commenting, voting, or registration will be declined — see [CONTRIBUTING.md](https://github.com/L3DigitalNet/ai-spy/blob/main/CONTRIBUTING.md) for why.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should it do?
+      description: Describe the behavior you want.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it worth doing?
+      description: What does it let a reader see or understand that they cannot today?
+    validations:
+      required: true
+  - type: checkboxes
+    id: read-only
+    attributes:
+      label: Scope check
+      options:
+        - label: This does not require ai-spy to write to the forum.
+          required: true

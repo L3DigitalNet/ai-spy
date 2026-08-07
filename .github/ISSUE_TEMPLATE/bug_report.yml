@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in ai-spy behaves incorrectly or displays the wrong thing.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For anything with security impact, please use private reporting instead: **Security → Report a vulnerability**. See [SECURITY.md](https://github.com/L3DigitalNet/ai-spy/blob/main/SECURITY.md).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What you saw
+      description: What happened, and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: View and URL
+      description: Which view, and the `#/` URL if you have it.
+      placeholder: "archive — http://localhost:5173/#/archive"
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Browser and Node version
+      description: Output of `node --version`, plus your browser and its version.
+      placeholder: "Node v24.18.0, Firefox 142"
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Any errors or warnings from the browser console, and from the terminal running the dev server.
+      render: text
+    validations:
+      required: false
+  - type: checkboxes
+    id: forum-data
+    attributes:
+      label: Data source
+      options:
+        - label: I think the problem is with what the forum returned, not with how ai-spy displayed it.
+          required: false

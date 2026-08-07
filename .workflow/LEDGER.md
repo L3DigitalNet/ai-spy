@@ -4,8 +4,8 @@
 >
 > The notation: `[x]` done, `[~]` deferred. `V0`/`V1`/`V2` is the verification depth an item was closed at: `V0` a read-only finding backed by a grounded source, `V1` a change proven by its own tests plus an independently run smoke check, `V2` a change put through the full gate and re-checked by a separate reviewer working from a fresh context.
 
-Base: main @ 7cbd616d6962f5fbf894aa215784a5797ebddeb4
-Unrelated in-flight work to preserve: staged edit to .claude/settings.json (do not commit or revert).
+Base: main @ 746efb2
+Note: commit SHAs in this file were rewritten when docs/prompt.md was purged from history before the repository was made public. They point at the rewritten commits, which carry the same changes minus that file.
 
 ## Items
 
@@ -17,7 +17,7 @@ Unrelated in-flight work to preserve: staged edit to .claude/settings.json (do n
 - [x] 4. UI views (feed/thread/citizens/transparency/treasury) — V2: verifier CONFIRMED functional, XSS-safety (hostile fetch-injection pass), router; ErrorBoundary + timestamp-range fix in flight
 - [x] 5. Verified — V2: verifier CONFIRMED x6; four verifier findings fixed and re-proven; orchestrator-run post-fix npm check/build pass, Python gate pass, handoff validators pass, browser smoke (feed/thread/transparency) clean console
 - [x] 6. Docs updated (README, STATUS, TODO, architecture, handoff session/state) — V1: agent-handoff validate + drift-check exit 0 (worker), orchestrator re-run pending at closing gate; README CORS-claim correction in flight
-- [x] 7. Committed d1036f5 and pushed to origin/main — V1: push output + post-push status verified; .claude/settings.json left untouched/uncommitted
+- [x] 7. Committed 0e8a6f9 and pushed to origin/main — V1: push output + post-push status verified; .claude/settings.json left untouched/uncommitted
 
 ## Dependencies
 
@@ -27,20 +27,20 @@ READY frontier: {1, 2}
 ## Dispatch manifest
 
 - researcher (sonnet) | read-only + single artifact write to .workflow/api-surface.md | item 1 | base n/a
-- engineer (opus) | mutation, main working tree | item 2 | base 7cbd616
+- engineer (opus) | mutation, main working tree | item 2 | base 746efb2
 
 ## Phase 2 — authenticated tier + remaining read capabilities (user-directed 2026-08-06)
 
-Base: main @ d1036f5. User authorized registration on 1f916.ai; scope = everything except writes and MCP.
+Base: main @ 0e8a6f9. User authorized registration on 1f916.ai; scope = everything except writes and MCP.
 
 - [x] 8. Auth endpoints documented in api-surface.md addendum — V0: from upstream source, 401 shapes live-confirmed
 - [x] 9. Registered on 1f916.ai as citizen #317 (handle ai-spy); secret stored in the maintainer's secret manager, path recorded in docs/handoff/credentials.md — V1: orchestrator-run 201 + secret-manager round-trip + authenticated /api/me 200; temp file shredded; credentials.md reference pending in docs leg (item 15)
 - [x] 10. Live updates via /api/changes polling on feed views — worker evidence: real-path poll proof, drain-cap 5, next_since cursor discipline, visibility pause; integrated verify at 14
 - [x] 11. Attest witness mode — worker evidence: live save/recheck round-trip (expect_matches:true), simulated mismatch renders red, corrupt-storage safe; integrated verify at 14
-- [x] 12. humans.txt easter egg + "(includes moderated)" census marker — karma column and census stats already existed in d1036f5 (earlier gap report was wrong on those two); integrated verify at 14
+- [x] 12. humans.txt easter egg + "(includes moderated)" census marker — karma column and census stats already existed in 0e8a6f9 (earlier gap report was wrong on those two); integrated verify at 14
 - [x] 13. Authenticated account views with proxy-side Bearer injection — worker evidence: echo-listener header-scoping proof (4 auth paths, 9 public + 3 decoy paths clean), bundle greps clean, byte-identical builds ± secret; integrated verify at 14
 - [x] 14. Phase-2 verification COMPLETE — verifier pass (6 claims) + archive delta pass; all REFUTED/defect findings fixed and re-verified; orchestrator-run gates (npm check w/ 109 tests, build, Python, handoff validators) green; orchestrator visual review of 4 views + own secret audit (0 hits)
-- [x] 15. Docs updated (README, STATUS, TODO, architecture, credentials, session, state; validators exit 0) — committed dc92a6c and pushed to origin/main
+- [x] 15. Docs updated (README, STATUS, TODO, architecture, credentials, session, state; validators exit 0) — committed e0c161e and pushed to origin/main
 - [x] 17. Archive view (#/archive) — user instructed the implementer directly ("build it"). V2: adversarial audit CONFIRMED XSS-safe (all fields + control chars + 8 URL schemes), dedup 256 raw -> 201 distinct vs live API, cache/paging/race clean, a11y fixed
 - [x] 23. Archive defect fixes A1-A4 + load politeness — worker-verified: truncation now surfaced as "partial index", ModBadge on moderated rows, counter reports failures, filter debounced (28->6 requests); session cost 82->51 requests cold, 0 warm
 - [x] 25. Orphaned hairline above witness controls fixed at root cause (prose measure was applying to control rows)

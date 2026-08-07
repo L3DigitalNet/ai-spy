@@ -4,6 +4,10 @@ A local, read-only web UI for watching [1F916.ai](https://1f916.ai/), a public s
 
 You run it on your own machine, it makes only `GET` requests, and it never posts anything. The name is the joke: the humans are watching.
 
+![The ai-spy front page: a dark single-column feed of forum posts, each with a vote count and decayed rank in the left rail, a PINNED tag, a title, a 280-character teaser cut off with a "cut at 280 — open the thread" marker, and a byline showing the citizen number, handle, declared model, comment count, and age.](docs/images/feed.png)
+
+_The ranked feed. Every post is written by an autonomous agent; ai-spy shows the text and stays out of the way._
+
 ## What 1F916.ai is, and why watch it
 
 1F916.ai is a forum where only autonomous agents can register, post, comment, and vote. Humans can read it, but there is no human sign-up and no human write path. The glass is one-way by design.
@@ -18,7 +22,9 @@ Everything a citizen writes is untrusted. Handles, titles, comment bodies, and l
 
 ## What it looks like
 
-A dark, single-column "observation deck": near-black background, one teal accent, spaced monospace for ai-spy's own chrome and readouts, and a sans-serif face for anything an agent actually wrote. The typeface change is the whole point of the scheme, marking off the room's voice from ai-spy's. There is deliberately no light variant. Navigation is a row of lowercase links across the top (`top`, `new`, `archive`, `citizens`, `transparency`, `treasury`, `account`) and routing is hash-based, so every view has a shareable `#/…` URL.
+An "observation deck", as above. The one rule the design actually enforces is the typeface split: spaced monospace for ai-spy's own chrome and readouts, a sans-serif face for anything an agent wrote. That is what marks off the room's voice from ai-spy's, so you always know which of the two is talking. There is deliberately no light variant.
+
+Routing is hash-based, so every view has a shareable `#/…` URL.
 
 ## Requirements
 
@@ -64,6 +70,10 @@ Because the app calls `/api` and `/treasury` as relative paths, the build is not
 **Transparency** (`#/transparency`): the forum's hash-chain attestation status, its identity events log, and its official addresses (including the forum's own statement that it has no token, which is itself an anti-scam measure).
 
 This view also carries **witness mode**. Save a verified chain head and ai-spy writes it to your browser's `localStorage`. On a later visit it sends that saved id and hash back as the attestation call's anchor, and the forum answers whether the chain at that point still matches. A mismatch renders as a tamper warning. This works as independent evidence only because the saved copy lives somewhere the forum does not control: your browser profile. It is never exported, transmitted, or synced anywhere.
+
+![The ai-spy transparency view: a green "Both chains verified" banner over two side-by-side panels for the identity log and the treasury ledger. Each panel has a "start witnessing" button, counts of sealed, unsealed and total rows, the id verified through, a note that legacy rows predate hash-chain sealing and can never be attested, and the full hex chain head. Below, the forum's own text explains that a chain you only ever ask the forum about proves nothing, because whoever holds the database could rewrite history and recompute the chains to match.](docs/images/transparency.png)
+
+_The transparency view, showing both chains verified and the forum's own account of what that does and does not prove._
 
 **Treasury** (`#/treasury`): the forum's ledger, its wallet address and network, its census counts, and its balance, which is signed and genuinely negative in practice.
 
@@ -154,9 +164,9 @@ scripts/check.py         runs the Python tooling gate over that scaffolding
 
 ## Contributing
 
-This is a personal project, maintained irregularly and mostly for its own sake. Issues and pull requests are welcome, but responses may be slow and the scope is intentionally narrow: ai-spy observes 1F916.ai and does not write to it, and that is not up for negotiation.
+Issues and pull requests are welcome, though responses may be slow. One scope rule is fixed: ai-spy observes 1F916.ai and never writes to it, so patches adding posting, commenting, or voting will be declined.
 
-If you file a bug about forum data looking wrong, please include the view and, where relevant, the `#/` URL.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, the gate to pass, and the conventions that keep hostile forum content inert. For anything with security impact, see [SECURITY.md](SECURITY.md).
 
 ## License
 
