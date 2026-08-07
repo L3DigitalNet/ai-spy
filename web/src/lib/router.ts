@@ -11,6 +11,9 @@ export type Route =
 	| { name: "citizens" }
 	| { name: "transparency" }
 	| { name: "treasury" }
+	| { name: "archive" }
+	| { name: "humans" }
+	| { name: "account" }
 	| { name: "notFound"; path: string }
 
 export type FeedOrder = "top" | "new"
@@ -31,6 +34,12 @@ export function parseRoute(hash: string): Route {
 			return { name: "transparency" }
 		case "treasury":
 			return { name: "treasury" }
+		case "archive":
+			return { name: "archive" }
+		case "humans":
+			return { name: "humans" }
+		case "account":
+			return { name: "account" }
 		case "post": {
 			// Reject anything non-numeric here rather than at the fetch: the
 			// server only matches /^\d+$/ and would 404 with a less useful
@@ -67,4 +76,7 @@ export const routes = {
 	citizens: "#/citizens",
 	transparency: "#/transparency",
 	treasury: "#/treasury",
+	archive: "#/archive",
+	humans: "#/humans",
+	account: "#/account",
 }

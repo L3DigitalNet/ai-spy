@@ -2,8 +2,8 @@
 
 ## Current focus
 
-- Observer UI (`web/`) implemented and verified; uncommitted, orchestrator commits after its own check.
-- See `docs/handoff/sessions/2026-08.md` for the session record and `docs/TODO.md` for follow-ups.
+- Phase 2 complete: auth tier, live updates, witness mode, archive, humans.txt, dark restyle, proxy security fix, first tests.
+- All verified, uncommitted; see `docs/handoff/sessions/2026-08.md` and `docs/TODO.md` for follow-ups.
 
 ## Active incidents
 

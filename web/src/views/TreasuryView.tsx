@@ -39,15 +39,17 @@ export function TreasuryView() {
 				<section className="card">
 					<h3>Wallet</h3>
 					<dl className="facts">
-						<dt>Address</dt>
-						<dd>
-							<code className="hash">{treasury.wallet.address}</code>
-						</dd>
 						<dt>Network</dt>
 						<dd>{treasury.wallet.network}</dd>
 						<dt>Asset</dt>
 						<dd>{treasury.wallet.asset}</dd>
 					</dl>
+					{/* An on-chain address is checked character by character, like a
+					    hash — it needs a full line, never a truncated readout cell. */}
+					<div className="hash-row">
+						<span className="label">Address</span>
+						<code className="hash">{treasury.wallet.address}</code>
+					</div>
 					<p className="muted small">{treasury.wallet.note}</p>
 				</section>
 
@@ -57,59 +59,68 @@ export function TreasuryView() {
 						<dt>Citizens</dt>
 						<dd>{treasury.census.citizens}</dd>
 						<dt>Posts</dt>
-						{/* Unlike the feeds, this count includes moderated posts. */}
-						<dd>{treasury.census.posts}</dd>
+						<dd>
+							{treasury.census.posts}
+							<span className="muted"> (includes moderated)</span>
+						</dd>
 						<dt>Ledger in</dt>
 						<dd>{formatCents(inflow)}</dd>
 						<dt>Ledger out</dt>
 						<dd>{formatCents(outflow)}</dd>
 					</dl>
 					<p className="muted small">
-						Totals cover the {treasury.entries.length} entries below, which are capped
-						at 200 by the API — not necessarily the whole ledger.
+						These are live counts of the whole society, so they will not match the
+						feeds: the post total counts moderated posts, which the feeds filter out
+						entirely, and a feed shows at most 30 rows regardless.
+					</p>
+					<p className="muted small">
+						Ledger totals cover the {treasury.entries.length} entries below, which are
+						capped at 200 by the API — not necessarily the whole ledger.
 					</p>
 				</section>
 			</div>
 
 			<h2 className="section-title">Ledger</h2>
-			<table className="table">
-				<thead>
-					<tr>
-						<th scope="col" className="numeric">
-							#
-						</th>
-						<th scope="col">Date</th>
-						<th scope="col">Description</th>
-						<th scope="col" className="numeric">
-							Amount
-						</th>
-						<th scope="col">Recorded</th>
-						<th scope="col">Hash</th>
-					</tr>
-				</thead>
-				<tbody>
-					{treasury.entries.map((entry) => (
-						<tr key={entry.id}>
-							<td className="numeric">{entry.id}</td>
-							{/* entry_date is already a YYYY-MM-DD calendar string; it is
-							    not epoch ms and must not go through a date formatter. */}
-							<td>{entry.entry_date}</td>
-							<td className="detail">{entry.description}</td>
-							<td
-								className={`numeric ${entry.amount_cents < 0 ? "status--bad" : "status--good"}`}
-							>
-								{formatCents(entry.amount_cents)}
-							</td>
-							<td>
-								<TimeStamp epochMs={entry.created_at} />
-							</td>
-							<td>
-								<Hash value={entry.hash} />
-							</td>
+			<div className="table-scroll">
+				<table className="table">
+					<thead>
+						<tr>
+							<th scope="col" className="numeric">
+								#
+							</th>
+							<th scope="col">Date</th>
+							<th scope="col">Description</th>
+							<th scope="col" className="numeric">
+								Amount
+							</th>
+							<th scope="col">Recorded</th>
+							<th scope="col">Hash</th>
 						</tr>
-					))}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{treasury.entries.map((entry) => (
+							<tr key={entry.id}>
+								<td className="numeric">{entry.id}</td>
+								{/* entry_date is already a YYYY-MM-DD calendar string; it is
+							    not epoch ms and must not go through a date formatter. */}
+								<td>{entry.entry_date}</td>
+								<td className="detail">{entry.description}</td>
+								<td
+									className={`numeric ${entry.amount_cents < 0 ? "status--bad" : "status--good"}`}
+								>
+									{formatCents(entry.amount_cents)}
+								</td>
+								<td>
+									<TimeStamp epochMs={entry.created_at} />
+								</td>
+								<td>
+									<Hash value={entry.hash} />
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
 
 			<p className="muted small">{treasury.how_to_verify}</p>
 		</>

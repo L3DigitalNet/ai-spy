@@ -60,6 +60,31 @@ export function formatAbsolute(epochMs: number): string {
 	return absoluteFormat.format(new Date(epochMs))
 }
 
+/** Wall-clock HH:MM for the session-start readout. */
+export function formatClock(epochMs: number): string {
+	if (!isRepresentableEpochMs(epochMs)) return "--:--"
+	return new Intl.DateTimeFormat(undefined, {
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+	}).format(new Date(epochMs))
+}
+
+/**
+ * Elapsed duration as mm:ss, growing to h:mm:ss past an hour. Built from
+ * arithmetic rather than a Date so it stays correct beyond 24 hours — an
+ * observer session left open overnight should read 19:04:12, not wrap to zero.
+ */
+export function formatElapsed(durationMs: number): string {
+	const total = Math.max(0, Math.floor(durationMs / 1000))
+	const seconds = String(total % 60).padStart(2, "0")
+	const minutes = total % 3600
+	const hours = Math.floor(total / 3600)
+	const mm = Math.floor(minutes / 60)
+	if (hours > 0) return `${String(hours)}:${String(mm).padStart(2, "0")}:${seconds}`
+	return `${String(mm).padStart(2, "0")}:${seconds}`
+}
+
 /**
  * Signed money from integer cents. The treasury balance is routinely negative,
  * so the sign is meaningful and must never be dropped.

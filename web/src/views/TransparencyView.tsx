@@ -1,6 +1,18 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
-import { fetchAttest, fetchEvents, fetchOfficial } from "../api/client"
+import {
+	fetchAttest,
+	fetchEvents,
+	fetchOfficial,
+	type WitnessAnchors,
+} from "../api/client"
+import {
+	clearWitness,
+	readWitness,
+	writeWitness,
+	type ChainId,
+	type Witness,
+} from "../lib/witness"
 import {
 	EVENT_KINDS,
 	type Attest,
@@ -30,7 +42,177 @@ function statusTone(status: string): string {
 	return "status--warn"
 }
 
-function ChainCard({ label, chain }: { label: string; chain: TableAttestation }) {
+interface WitnessPanelProps {
+	chainId: ChainId
+	chain: TableAttestation
+	witness: Witness | null
+	storageBlocked: boolean
+	onSave: (chainId: ChainId, chain: TableAttestation) => void
+	onClear: (chainId: ChainId) => void
+}
+
+/**
+ * The witness affordance for one chain.
+ *
+ * `expect_matches` is only present when this request carried an anchor, so its
+ * absence means "not asked", never "no". Undefined must therefore not fall into
+ * the mismatch branch — that would scream tampering at a reader who simply has
+ * no witness saved yet.
+ */
+function WitnessPanel({
+	chainId,
+	chain,
+	witness,
+	storageBlocked,
+	onSave,
+	onClear,
+}: WitnessPanelProps) {
+	// Session-scoped only. A tamper warning that could be permanently silenced
+	// with one click would be worth very little, so this deliberately does not
+	// persist: reload and it is back.
+	const [dismissed, setDismissed] = useState(false)
+
+	if (storageBlocked) {
+		return (
+			<p className="witness muted small">
+				Witnessing needs browser storage, which is unavailable here (private mode or a
+				storage policy). The attestation above still works; it just cannot be compared
+				against a copy you saved earlier.
+			</p>
+		)
+	}
+
+	if (witness === null) {
+		// Anchoring needs an id to anchor AT. A chain that has not verified, or
+		// has no sealed row yet, gives nothing meaningful to save.
+		const canWitness = chain.status === "verified" && chain.verified_through_id !== null
+		return (
+			<p className="witness">
+				<button
+					type="button"
+					disabled={!canWitness}
+					onClick={() => {
+						onSave(chainId, chain)
+					}}
+				>
+					Start witnessing
+				</button>{" "}
+				<span className="muted small">
+					{canWitness
+						? "Saves this chain's current head in your browser, so a later visit can prove nothing before this point was rewritten."
+						: "Available once this chain reports a verified sealed head."}
+				</span>
+			</p>
+		)
+	}
+
+	if (chain.expect_matches === false && !dismissed) {
+		return (
+			<div className="witness witness--alert" role="alert">
+				<p>
+					<strong>This chain no longer matches what you saved.</strong>
+				</p>
+				<p className="small">
+					At row {witness.verified_through_id} the forum previously hashed to the first
+					value below. It now hashes to the second. A hash chain cannot change at an old
+					row through normal appends — so the record at or before that point was
+					rewritten or truncated after {formatAbsolute(witness.checked_at)}. The other
+					possibility is far more mundane: a saved value from a different chain or a
+					different site. Treat it as serious until you have ruled that out, and compare
+					against another citizen&apos;s independently saved head before drawing a
+					conclusion.
+				</p>
+				<div className="hash-row">
+					<span className="label">You saved</span>
+					<Hash value={witness.head} />
+				</div>
+				<div className="hash-row">
+					<span className="label">Chain holds now</span>
+					<Hash value={chain.anchor_at_from ?? null} />
+				</div>
+				{chain.reason === undefined ? null : (
+					<p className="small muted">{chain.reason}</p>
+				)}
+				<p>
+					<button
+						type="button"
+						onClick={() => {
+							setDismissed(true)
+						}}
+					>
+						Keep my witness
+					</button>{" "}
+					<button
+						type="button"
+						onClick={() => {
+							onSave(chainId, chain)
+						}}
+					>
+						Replace with the current head
+					</button>
+				</p>
+			</div>
+		)
+	}
+
+	// Three distinct states, and collapsing any two of them would misinform:
+	//   true      — re-checked and consistent.
+	//   false     — re-checked and NOT consistent; the reader dismissed the full
+	//               alert, so this is the compact form. It stays red, because
+	//               dismissing a mismatch does not resolve it.
+	//   undefined — the server was not asked (no anchor on this request), which
+	//               is not evidence either way.
+	const saved = formatAbsolute(witness.checked_at)
+	const [tone, summary] =
+		chain.expect_matches === true
+			? ["status--good", `Witness from ${saved} — chain consistent with what you saved`]
+			: chain.expect_matches === false
+				? ["status--bad", `Witness from ${saved} — MISMATCH, dismissed for this visit`]
+				: ["status--warn", `Witness from ${saved} — not re-checked in this response`]
+
+	return (
+		<p className="witness">
+			<span className={tone}>{summary}</span>{" "}
+			<button
+				type="button"
+				onClick={() => {
+					onSave(chainId, chain)
+				}}
+			>
+				Update witness
+			</button>{" "}
+			<button
+				type="button"
+				className="linkish"
+				onClick={() => {
+					onClear(chainId)
+				}}
+			>
+				Clear witness
+			</button>
+		</p>
+	)
+}
+
+/** Per-chain witness state and handlers, threaded down from the view. */
+interface WitnessControls {
+	witnesses: Record<ChainId, Witness | null>
+	storageBlocked: boolean
+	onSave: (chainId: ChainId, chain: TableAttestation) => void
+	onClear: (chainId: ChainId) => void
+}
+
+function ChainCard({
+	label,
+	chainId,
+	chain,
+	controls,
+}: {
+	label: string
+	chainId: ChainId
+	chain: TableAttestation
+	controls: WitnessControls
+}) {
 	return (
 		<section className="card">
 			<h3>
@@ -40,32 +222,28 @@ function ChainCard({ label, chain }: { label: string; chain: TableAttestation })
 
 			{chain.reason === undefined ? null : <p className="muted">{chain.reason}</p>}
 
+			<WitnessPanel
+				chainId={chainId}
+				chain={chain}
+				witness={controls.witnesses[chainId]}
+				storageBlocked={controls.storageBlocked}
+				onSave={controls.onSave}
+				onClear={controls.onClear}
+			/>
+
+			{/* Counts go in the readout grid, where right-aligned tabular figures
+			    line up and compare at a glance. Hashes do not: 64 hex characters
+			    cannot share a row with a label without either wrapping raggedly or
+			    being truncated, and a truncated hash is useless for the one thing a
+			    hash is for. They get their own full-width block instead. */}
 			<dl className="facts">
-				<dt>Head</dt>
-				<dd>
-					<Hash value={chain.head} />
-				</dd>
-
-				{/* Only worth showing when it differs from head — equal values mean
-				    this call verified all the way to the tip. */}
-				{chain.verified_head === chain.head ? null : (
-					<>
-						<dt>Verified head</dt>
-						<dd>
-							<Hash value={chain.verified_head} />
-						</dd>
-					</>
-				)}
-
 				<dt>Sealed rows</dt>
 				<dd>{chain.sealed_entries}</dd>
 
 				<dt>Unsealed rows</dt>
 				<dd>
 					{chain.unsealed_entries}
-					{chain.unsealed_entries > 0 ? (
-						<span className="muted"> (legacy, pre-chain — never attestable)</span>
-					) : null}
+					{chain.unsealed_entries > 0 ? <span className="muted"> legacy</span> : null}
 				</dd>
 
 				<dt>Total rows</dt>
@@ -81,11 +259,37 @@ function ChainCard({ label, chain }: { label: string; chain: TableAttestation })
 					</>
 				)}
 			</dl>
+
+			{chain.unsealed_entries > 0 ? (
+				<p className="notice notice--quiet">
+					Legacy rows predate hash-chain sealing and can never be attested.
+				</p>
+			) : null}
+
+			<div className="hash-row">
+				<span className="label">Head</span>
+				<Hash value={chain.head} />
+			</div>
+
+			{/* Only worth showing when it differs from head — equal values mean
+			    this call verified all the way to the tip. */}
+			{chain.verified_head === chain.head ? null : (
+				<div className="hash-row">
+					<span className="label">Verified head</span>
+					<Hash value={chain.verified_head} />
+				</div>
+			)}
 		</section>
 	)
 }
 
-function Attestation({ attest }: { attest: Attest }) {
+function Attestation({
+	attest,
+	controls,
+}: {
+	attest: Attest
+	controls: WitnessControls
+}) {
 	return (
 		<>
 			<div className={`banner ${attest.ok ? "status--good" : "status--bad"}`}>
@@ -97,8 +301,18 @@ function Attestation({ attest }: { attest: Attest }) {
 				</span>
 			</div>
 			<div className="cards">
-				<ChainCard label="Identity log" chain={attest.identity_log} />
-				<ChainCard label="Treasury ledger" chain={attest.treasury} />
+				<ChainCard
+					label="Identity log"
+					chainId="identity"
+					chain={attest.identity_log}
+					controls={controls}
+				/>
+				<ChainCard
+					label="Treasury ledger"
+					chainId="ledger"
+					chain={attest.treasury}
+					controls={controls}
+				/>
 			</div>
 			<p className="muted small">{attest.what_this_proves}</p>
 			<p className="muted small">{attest.what_this_does_not_prove}</p>
@@ -144,13 +358,9 @@ function OfficialFacts({ official }: { official: Official }) {
 					)}
 				</dd>
 
-				<dt>Treasury address</dt>
+				<dt>Treasury</dt>
 				<dd>
-					<code className="hash">{official.treasury.address}</code>
-					<span className="muted">
-						{" "}
-						{official.treasury.asset} on {official.treasury.network}
-					</span>
+					{official.treasury.asset} on {official.treasury.network}
 				</dd>
 
 				<dt>Sanctioned money in</dt>
@@ -173,11 +383,14 @@ function OfficialFacts({ official }: { official: Official }) {
 
 				<dt>Source of record</dt>
 				<dd>
-					<ExternalLink href={official.source_of_record}>
-						{official.source_of_record}
-					</ExternalLink>
+					<ExternalLink href={official.source_of_record}>github</ExternalLink>
 				</dd>
 			</dl>
+
+			<div className="hash-row">
+				<span className="label">Treasury address</span>
+				<code className="hash">{official.treasury.address}</code>
+			</div>
 		</section>
 	)
 }
@@ -235,38 +448,40 @@ function EventsLog() {
 						{/* count is this page's length, capped at 500 — not a total. */}
 						{state.data.count} events on this page (newest first, no paging beyond 500).
 					</p>
-					<table className="table">
-						<thead>
-							<tr>
-								<th scope="col" className="numeric">
-									#
-								</th>
-								<th scope="col">Kind</th>
-								<th scope="col">Actor</th>
-								<th scope="col">Detail</th>
-								<th scope="col">When</th>
-								<th scope="col">Hash</th>
-							</tr>
-						</thead>
-						<tbody>
-							{state.data.events.map((event) => (
-								<tr key={event.id}>
-									<td className="numeric">{event.id}</td>
-									<td>
-										<span className="chip">{event.kind}</span>
-									</td>
-									<td>{event.citizen}</td>
-									<td className="detail">{event.detail ?? "—"}</td>
-									<td title={formatAbsolute(event.created_at)}>
-										{formatRelative(event.created_at)}
-									</td>
-									<td>
-										<Hash value={event.hash} />
-									</td>
+					<div className="table-scroll">
+						<table className="table">
+							<thead>
+								<tr>
+									<th scope="col" className="numeric">
+										#
+									</th>
+									<th scope="col">Kind</th>
+									<th scope="col">Actor</th>
+									<th scope="col">Detail</th>
+									<th scope="col">When</th>
+									<th scope="col">Hash</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{state.data.events.map((event) => (
+									<tr key={event.id}>
+										<td className="numeric">{event.id}</td>
+										<td>
+											<span className="chip">{event.kind}</span>
+										</td>
+										<td>{event.citizen}</td>
+										<td className="detail">{event.detail ?? "—"}</td>
+										<td title={formatAbsolute(event.created_at)}>
+											{formatRelative(event.created_at)}
+										</td>
+										<td>
+											<Hash value={event.hash} />
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				</>
 			) : null}
 		</section>
@@ -274,14 +489,75 @@ function EventsLog() {
 }
 
 export function TransparencyView() {
+	// Read once on mount. Storage is only re-read through these handlers, so the
+	// rendered state and the stored state cannot drift apart mid-session.
+	const [witnesses, setWitnesses] = useState<Record<ChainId, Witness | null>>(() => ({
+		identity: readWitness("identity"),
+		ledger: readWitness("ledger"),
+	}))
+	const [storageBlocked, setStorageBlocked] = useState(false)
+
+	/**
+	 * Each saved witness contributes BOTH its anchor id and its hash. Sending
+	 * the hash alone would have the server compare against genesis, and sending
+	 * the id alone asks nothing at all.
+	 */
+	const anchors = useMemo<WitnessAnchors>(() => {
+		const next: WitnessAnchors = {}
+		if (witnesses.identity !== null) {
+			next.identity = {
+				from: witnesses.identity.verified_through_id,
+				expect: witnesses.identity.head,
+			}
+		}
+		if (witnesses.ledger !== null) {
+			next.ledger = {
+				from: witnesses.ledger.verified_through_id,
+				expect: witnesses.ledger.head,
+			}
+		}
+		return next
+	}, [witnesses])
+
 	// Attestation and official facts load together because they are one
 	// statement: "here is what verified, and here is who is allowed to say so."
+	// Saving or clearing a witness changes `anchors`, which re-runs this loader —
+	// that refetch is what turns a freshly saved head into a confirmed
+	// round-trip rather than an unverified local note.
 	const load = useCallback(
 		async (signal: AbortSignal) =>
-			Promise.all([fetchAttest(signal), fetchOfficial(signal)]),
-		[]
+			Promise.all([fetchAttest(anchors, signal), fetchOfficial(signal)]),
+		[anchors]
 	)
 	const { state, retry } = useAsync(load)
+
+	const handleSave = useCallback((chainId: ChainId, chain: TableAttestation) => {
+		// head, not verified_head: head is the true chain tip independent of how
+		// far this call paged, and it is the value the next check must anchor to.
+		if (chain.verified_through_id === null) return
+		const witness: Witness = {
+			head: chain.head,
+			verified_through_id: chain.verified_through_id,
+			checked_at: Date.now(),
+		}
+		if (!writeWitness(chainId, witness)) {
+			setStorageBlocked(true)
+			return
+		}
+		setWitnesses((previous) => ({ ...previous, [chainId]: witness }))
+	}, [])
+
+	const handleClear = useCallback((chainId: ChainId) => {
+		clearWitness(chainId)
+		setWitnesses((previous) => ({ ...previous, [chainId]: null }))
+	}, [])
+
+	const controls: WitnessControls = {
+		witnesses,
+		storageBlocked,
+		onSave: handleSave,
+		onClear: handleClear,
+	}
 
 	return (
 		<>
@@ -292,7 +568,7 @@ export function TransparencyView() {
 			) : null}
 			{state.status === "ready" ? (
 				<>
-					<Attestation attest={state.data[0]} />
+					<Attestation attest={state.data[0]} controls={controls} />
 					<OfficialFacts official={state.data[1]} />
 				</>
 			) : null}

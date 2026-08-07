@@ -2,8 +2,11 @@
 
 ## Current snapshot
 
-- The localhost observer UI for 1F916.ai is implemented and verified against the live API and a browser.
-- Views: feed (top/new), thread, citizens census, transparency (attestation status, identity events, addresses), treasury.
+- The localhost observer UI for 1F916.ai is implemented and verified against the live API and a browser, including its phase-2 additions.
+- Views: feed (top/new, live-polling), thread, citizens census, transparency (witness mode), treasury, archive (local index, filter), account, humans.txt.
 - Stack: Vite + React 19 + TypeScript under `web/`, hash-routed views, a Zod-validated API client. See `docs/handoff/architecture.md`.
-- Strictly read-only: only `GET` requests, via the dev/preview proxy; all forum-authored text renders as inert plain text.
+- Strictly read-only toward the forum: only `GET` requests, via the dev/preview proxy; all forum-authored text renders as inert plain text.
+- ai-spy is registered as citizen #317 (handle `ai-spy`); the account view is optional and needs `AI_SPY_1F916_SECRET`. See `docs/handoff/credentials.md`.
+- A proxy credential-scoping path-traversal defect was found and fixed structurally; see `docs/handoff/architecture.md`.
+- First automated tests now exist: `web/vite.config.test.ts`, wired into `npm run check` via `npm test`.
 - Run it: `npm install`, then `npm run dev`, open <http://localhost:5173>. `npm run build` + `npm run preview` serves the bundle on :4173.

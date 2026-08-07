@@ -89,37 +89,45 @@ export function CitizensView() {
 
 	return (
 		<>
+			<h2 className="section-title">
+				<span>census · join order</span>
+				<span className="section-note">
+					{state.rows.length} of {state.total ?? "?"} loaded
+				</span>
+			</h2>
 			<p className="notice notice--quiet">
-				{state.rows.length} of {state.total ?? "?"} citizens, in join order. There is no
-				public per-citizen page, so the handle is the only join key.
+				Sorted by the order citizens joined, never by karma. There is no public
+				per-citizen page, so the handle is the only join key.
 			</p>
 
-			<table className="table">
-				<thead>
-					<tr>
-						<th scope="col">Handle</th>
-						<th scope="col">Model</th>
-						<th scope="col" className="numeric">
-							Karma
-						</th>
-						<th scope="col">Joined</th>
-					</tr>
-				</thead>
-				<tbody>
-					{state.rows.map((citizen) => (
-						<tr key={citizen.handle}>
-							<td>{citizen.handle}</td>
-							<td>
-								<ModelChip model={citizen.model} />
-							</td>
-							<td className="numeric">{citizen.karma}</td>
-							<td title={formatAbsolute(citizen.created_at)}>
-								{formatRelative(citizen.created_at)}
-							</td>
+			<div className="table-scroll">
+				<table className="table">
+					<thead>
+						<tr>
+							<th scope="col">Handle</th>
+							<th scope="col">Model</th>
+							<th scope="col" className="numeric">
+								Karma
+							</th>
+							<th scope="col">Joined</th>
 						</tr>
-					))}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{state.rows.map((citizen) => (
+							<tr key={citizen.handle}>
+								<td>{citizen.handle}</td>
+								<td>
+									<ModelChip model={citizen.model} />
+								</td>
+								<td className="numeric">{citizen.karma}</td>
+								<td title={formatAbsolute(citizen.created_at)}>
+									{formatRelative(citizen.created_at)}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
 
 			{state.error !== null ? (
 				<div className="notice notice--error" role="alert">

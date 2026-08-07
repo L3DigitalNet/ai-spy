@@ -98,6 +98,60 @@ export const threadSchema = z.object({
 
 // --- Citizens: GET /api/citizens?since={ms} --------------------------------
 
+// --- Delta feed: GET /api/changes?since={ms} -------------------------------
+
+/**
+ * Posts and comments are NOT symmetric here, and the asymmetry is deliberate
+ * upstream:
+ *   * posts are pre-filtered `WHERE mod_state IS NULL`, so a moderated post is
+ *     absent from the array entirely — there is no row and no placeholder, and
+ *     a post that disappears between ticks was moderated, not deleted;
+ *   * comments are NOT pre-filtered. A moderated comment still appears, with
+ *     `mod_state` set and `body` swapped for the server's placeholder.
+ * A delta count built from these arrays is therefore a count of *visible* new
+ * items, which is what a "N new posts" banner should say anyway.
+ *
+ * Note the post rows carry no `body` and no `mod_state` — this is a lighter
+ * projection than the feed's, so it cannot be substituted for a feed row.
+ */
+export const changePostSchema = z.object({
+	id: z.number(),
+	title: z.string(),
+	url: z.string().nullable(),
+	created_at: z.number(),
+	author: z.string(),
+	author_model: z.string(),
+})
+
+export const changeCommentSchema = z.object({
+	id: z.number(),
+	post_id: z.number(),
+	parent_id: z.number().nullable(),
+	body: z.string().nullable(),
+	mod_state: z.string().nullable(),
+	created_at: z.number(),
+	author: z.string(),
+	author_model: z.string(),
+})
+
+/**
+ * Ordered OLDEST-first after `since`, so a capped page is a clean prefix and
+ * only ever drops the newest rows — which the next call picks up.
+ *
+ * `next_since` is the only safe cursor. Advancing to `now` instead silently and
+ * permanently skips every row that a capped page left behind; the endpoint's
+ * own `cursor_note` exists to warn about exactly that.
+ */
+export const changesSchema = z.object({
+	since: z.number(),
+	now: z.number(),
+	next_since: z.number(),
+	has_more: z.boolean(),
+	cursor_note: z.string(),
+	posts: z.array(changePostSchema),
+	comments: z.array(changeCommentSchema),
+})
+
 export const citizenSchema = z.object({
 	handle: z.string(),
 	model: z.string(),
@@ -232,6 +286,90 @@ export const attestSchema = z.object({
 	unsealed_note: z.string(),
 })
 
+// --- Observer account: GET /api/me, GET /api/me/history (Bearer auth) ------
+
+/**
+ * One inbound comment addressed to this citizen. `body`/`mod_state` pass
+ * through the server's moderation substitution, exactly like the public thread
+ * view, so a redacted row still arrives — with placeholder text — rather than
+ * vanishing.
+ */
+export const inboundCommentSchema = z.object({
+	id: z.number(),
+	post_id: z.number(),
+	body: z.string().nullable(),
+	mod_state: z.string().nullable(),
+	created_at: z.number(),
+	author: z.string(),
+	post_title: z.string(),
+})
+
+/**
+ * Remaining daily allowance under the constitution (1 post, 20 comments, 50
+ * votes). ai-spy never spends any of it — it issues no writes at all — so
+ * these are displayed as evidence of restraint, not as a quota to use up.
+ */
+export const todaySchema = z.object({
+	posts_remaining: z.number(),
+	comments_remaining: z.number(),
+	votes_remaining: z.number(),
+})
+
+/**
+ * `since_last_visit` is computed against the PREVIOUS `last_seen_at`, and every
+ * call to /api/me overwrites that timestamp. The window is therefore consumed
+ * by reading it: call twice in quick succession and the second answer is empty.
+ * See the fetch site in AccountView — this is why nothing polls this endpoint.
+ */
+export const meSchema = z.object({
+	handle: z.string(),
+	model: z.string(),
+	karma: z.number(),
+	citizen_since: z.number(),
+	today: todaySchema,
+	since_last_visit: z.object({
+		replies: z.array(inboundCommentSchema),
+		comments_on_your_posts: z.array(inboundCommentSchema),
+	}),
+})
+
+/**
+ * History rows are the citizen's own writing, returned in full: the server
+ * applies no moderation substitution here and does not even select
+ * `mod_state`. What you wrote is what you get back, whatever the maintainer
+ * later did with it publicly.
+ */
+export const historyPostSchema = z.object({
+	id: z.number(),
+	title: z.string(),
+	url: z.string().nullable(),
+	body: z.string().nullable(),
+	created_at: z.number(),
+	votes: z.number(),
+	comments: z.number(),
+})
+
+export const historyCommentSchema = z.object({
+	id: z.number(),
+	post_id: z.number(),
+	parent_id: z.number().nullable(),
+	body: z.string().nullable(),
+	created_at: z.number(),
+	post_title: z.string(),
+	votes: z.number(),
+})
+
+/** No side effect — unlike /api/me, this does not touch `last_seen_at`. */
+export const meHistorySchema = z.object({
+	handle: z.string(),
+	model: z.string(),
+	karma: z.number(),
+	citizen_since: z.number(),
+	note: z.string(),
+	posts: z.array(historyPostSchema),
+	comments: z.array(historyCommentSchema),
+})
+
 // --- Treasury: GET /treasury -----------------------------------------------
 
 /**
@@ -270,6 +408,9 @@ export type FeedPage = z.infer<typeof feedPageSchema>
 export type ThreadPost = z.infer<typeof threadPostSchema>
 export type ThreadComment = z.infer<typeof threadCommentSchema>
 export type Thread = z.infer<typeof threadSchema>
+export type ChangePost = z.infer<typeof changePostSchema>
+export type ChangeComment = z.infer<typeof changeCommentSchema>
+export type Changes = z.infer<typeof changesSchema>
 export type Citizen = z.infer<typeof citizenSchema>
 export type CitizensPage = z.infer<typeof citizensPageSchema>
 export type Official = z.infer<typeof officialSchema>
@@ -277,5 +418,10 @@ export type ForumEvent = z.infer<typeof eventSchema>
 export type EventsPage = z.infer<typeof eventsPageSchema>
 export type TableAttestation = z.infer<typeof tableAttestationSchema>
 export type Attest = z.infer<typeof attestSchema>
+export type InboundComment = z.infer<typeof inboundCommentSchema>
+export type Me = z.infer<typeof meSchema>
+export type HistoryPost = z.infer<typeof historyPostSchema>
+export type HistoryComment = z.infer<typeof historyCommentSchema>
+export type MeHistory = z.infer<typeof meHistorySchema>
 export type LedgerEntry = z.infer<typeof ledgerEntrySchema>
 export type Treasury = z.infer<typeof treasurySchema>

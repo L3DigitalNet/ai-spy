@@ -4,7 +4,10 @@ import { describeError, isAbortError } from "../api/client"
 
 export type AsyncState<T> =
 	| { status: "loading" }
-	| { status: "error"; message: string }
+	// `cause` is the original thrown value, kept alongside the display message
+	// so a caller can branch on the KIND of failure (a 401 is a configuration
+	// state, not an error) without re-parsing prose.
+	| { status: "error"; message: string; cause: unknown }
 	| { status: "ready"; data: T }
 
 export interface AsyncResult<T> {
@@ -39,7 +42,7 @@ export function useAsync<T>(load: (signal: AbortSignal) => Promise<T>): AsyncRes
 				// A cancelled request is an expected part of teardown, not an
 				// error worth showing.
 				if (controller.signal.aborted || isAbortError(cause)) return
-				setState({ status: "error", message: describeError(cause) })
+				setState({ status: "error", message: describeError(cause), cause })
 			})
 
 		return () => {

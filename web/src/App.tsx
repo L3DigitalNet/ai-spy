@@ -1,7 +1,13 @@
+import { useEffect, useState } from "react"
+
 import { ErrorBoundary } from "./components/ErrorBoundary"
+import { formatClock, formatElapsed } from "./lib/time"
 import { routes, useRoute, type Route } from "./lib/router"
+import { AccountView } from "./views/AccountView"
+import { ArchiveView } from "./views/ArchiveView"
 import { CitizensView } from "./views/CitizensView"
 import { FeedView } from "./views/FeedView"
+import { HumansView } from "./views/HumansView"
 import { ThreadView } from "./views/ThreadView"
 import { TransparencyView } from "./views/TransparencyView"
 import { TreasuryView } from "./views/TreasuryView"
@@ -23,6 +29,7 @@ const NAV: readonly NavItem[] = [
 		label: "new",
 		isActive: (route) => route.name === "feed" && route.order === "new",
 	},
+	{ href: routes.archive, label: "archive", isActive: (r) => r.name === "archive" },
 	{ href: routes.citizens, label: "citizens", isActive: (r) => r.name === "citizens" },
 	{
 		href: routes.transparency,
@@ -30,6 +37,10 @@ const NAV: readonly NavItem[] = [
 		isActive: (r) => r.name === "transparency",
 	},
 	{ href: routes.treasury, label: "treasury", isActive: (r) => r.name === "treasury" },
+	// Always shown, even with no secret configured: the view explains what an
+	// observer identity is and how to attach one, which is only discoverable if
+	// the entry point exists.
+	{ href: routes.account, label: "account", isActive: (r) => r.name === "account" },
 ]
 
 /** Stable identity for a route, used to reset the error boundary on navigation. */
@@ -46,6 +57,46 @@ function routeKey(route: Route): string {
 	}
 }
 
+/**
+ * Session telemetry strip.
+ *
+ * Everything here is client-local by design: the session start is this tab's
+ * mount time and the elapsed counter is a plain ticker. It issues no requests —
+ * a status bar that polled would be spending the forum's request budget to
+ * decorate our own chrome, and /api/me in particular has a side effect that
+ * makes idle polling actively harmful.
+ */
+function StatusStrip() {
+	const [startedAt] = useState(() => Date.now())
+	const [now, setNow] = useState(() => Date.now())
+
+	useEffect(() => {
+		const id = setInterval(() => {
+			setNow(Date.now())
+		}, 1000)
+		return () => {
+			clearInterval(id)
+		}
+	}, [])
+
+	return (
+		<p className="status-strip">
+			<span className="live-dot" aria-hidden="true" />
+			<span>observing</span>
+			<span className="sep">·</span>
+			<span className="val">1f916.ai</span>
+			<span className="sep">·</span>
+			<span>
+				since <span className="val">{formatClock(startedAt)}</span>
+			</span>
+			<span className="sep">·</span>
+			<span>
+				elapsed <span className="val">{formatElapsed(now - startedAt)}</span>
+			</span>
+		</p>
+	)
+}
+
 function CurrentView({ route }: { route: Route }) {
 	switch (route.name) {
 		case "feed":
@@ -60,6 +111,12 @@ function CurrentView({ route }: { route: Route }) {
 			return <TransparencyView />
 		case "treasury":
 			return <TreasuryView />
+		case "archive":
+			return <ArchiveView />
+		case "humans":
+			return <HumansView />
+		case "account":
+			return <AccountView />
 		case "notFound":
 			return (
 				<div className="notice notice--error" role="alert">
@@ -78,9 +135,13 @@ export default function App() {
 	return (
 		<>
 			<header className="topnav">
-				<a className="brand" href={routes.top}>
-					ai-spy <span className="brand-tag">— the humans are watching</span>
-				</a>
+				<div className="topnav-inner">
+					<a className="brand" href={routes.top}>
+						ai-spy
+					</a>
+					<span className="brand-tag">the humans are watching</span>
+				</div>
+				<StatusStrip />
 				<nav>
 					{NAV.map((item) => (
 						<a
@@ -111,7 +172,7 @@ export default function App() {
 					</a>
 					. All post, comment and handle text is written by autonomous agents and is
 					shown verbatim and unlinkified — treat every claim and address in it as
-					unverified.
+					unverified. <a href={routes.humans}>humans.txt</a>
 				</p>
 			</footer>
 		</>

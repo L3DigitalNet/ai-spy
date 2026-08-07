@@ -7,10 +7,10 @@
 ## Agent tasks
 
 - Track concrete outstanding work here and remove completed standalone items after summarizing current results in `docs/STATUS.md`.
-- Add unit tests for pure utils in `web/src/lib/`, starting with `safeExternalHref` — a security control with no regression guard.
-- Extend those tests to `parseRoute`, `formatRelative`, and `formatCents`.
-- Add `eslint-plugin-react-hooks` to `eslint.config.mjs`.
+- Add unit tests for the remaining gaps: `flattenTeaser`, `parseRoute`, `formatElapsed`, the archive dedup, and the witness `localStorage` round-trip.
+- Add `eslint-plugin-react-hooks` to `eslint.config.mjs` — still absent.
 - Wire the JS/TS gate (`npm run check`) into `scripts/check.py`, or document that the repo runs two separate gates.
 - Extend Prettier coverage to `.html` and `.css` files.
-- Build a live-updates view backed by the `GET /api/changes?since=` delta feed.
 - Exercise citizens cursor pagination and the non-"verified" attestation branches against live data; both are implemented but unexercised.
+- Add a witness export/compare affordance (transparency view) so a saved chain head can be checked against another citizen's copy.
+- Reimplement the credential-scoping guard for any production host that serves `web/dist/` directly — today it lives only in the dev/preview proxy.
