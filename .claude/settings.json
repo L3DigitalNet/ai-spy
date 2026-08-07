@@ -1,9 +1,4 @@
 {
-  "enabledPlugins": {
-    "chrome-devtools-mcp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -18,5 +13,10 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   }
 }
